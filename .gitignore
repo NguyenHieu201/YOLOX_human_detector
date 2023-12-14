@@ -148,3 +148,4 @@ datasets/*/*.jpg
 *.csv
 
 custom_exp/
+notebook/
