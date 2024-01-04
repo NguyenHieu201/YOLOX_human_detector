@@ -35,7 +35,7 @@ def get_exp_by_name(exp_name):
     return get_exp_by_file(exp_path)
 
 
-def get_exp(exp_file, exp_name):
+def get_exp(exp_file, exp_name=None):
     """
     get Exp object by file or name. If exp_file and exp_name
     are both provided, get Exp by exp_file.

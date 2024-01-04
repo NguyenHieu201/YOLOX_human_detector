@@ -108,6 +108,7 @@ def main(exp, args):
     # log_writer = open("./epoch_30/right_conf.txt", "a")
     trainer = Trainer(exp, args)
     trainer.before_train()
+    print(f"Start evaluation")
     summary = trainer.evaluate()
     # log_writer.write(f"nms: {exp.nmsthre}  conf: {exp.test_conf}\n")
     # log_writer.write(f"{summary}\n")

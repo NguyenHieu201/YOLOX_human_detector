@@ -1,18 +1,30 @@
 import os
 import json
 
-annotation_path = "./datasets/supermarket_dataset/annotations/train.json"
-dataset_path = "./datasets/supermarket_dataset/train/"
-train_path = "./train.json"
-val_path = "./val.json"
+annotation_path = "./datasets/supermarket_hd/annotations/data.json"
+dataset_path = "./datasets/supermarket_hd/train/"
+train_path = "./datasets/supermarket_hd/annotations/train.json"
+val_path = "./datasets/supermarket_hd/annotations/val.json"
 train_ratio = 0.8
-seqs = ["201_20231129_184822", "202_20231129_184822", "203_20231129_184822", "204_20231129_184822",
-        "201_20231204_120908", "202_20231204_120908", "203_20231204_120908", "204_20231204_120908",
-        "201_20231207_095105", "202_20231207_095105", "203_20231207_095105", "204_20231207_095105"]
+# seqs = ["201_20231129_184822", "202_20231129_184822", "203_20231129_184822", "204_20231129_184822",
+#         "201_20231204_120908", "202_20231204_120908", "203_20231204_120908", "204_20231204_120908",
+#         "201_20231207_095105", "202_20231207_095105", "203_20231207_095105", "204_20231207_095105",
+#         "205_20231208_2045_1920",
+#         "205_20231220_185141", "206_20231220_185141"]
 
-vals = [list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)),
-        list(range(400, 421)) + list(range(900, 921)), list(range(400, 421)) + list(range(900, 921)), list(range(400, 421)) + list(range(900, 921)), list(range(400, 421)) + list(range(900, 921)),
-        list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611))]
+# vals = [list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)),
+#         list(range(400, 421)) + list(range(900, 921)), list(range(400, 421)) + list(range(900, 921)), list(range(400, 421)) + list(range(900, 921)), list(range(400, 421)) + list(range(900, 921)),
+#         list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)), list(range(1, 31)) + list(range(1600, 1611)),
+#         list(range(14, 54)),
+#         list(range(0, 60)) + list(range(1450, 1510)), list(range(13, 73)) + list(range(1310, 1370))]
+
+
+seqs = ["205_20231208_2045_1920",
+        "205_20231220_185141",
+        "206_20231220_185141"]
+vals = [list(range(14, 54)),
+        list(range(0, 60)) + list(range(1450, 1510)),
+        list(range(13, 73)) + list(range(1310, 1370))]
 
 def split_by_name(annotations, filenames):
     datas = {"images": [], "annotations": [], "videos": [], "categories": []}
@@ -35,8 +47,10 @@ if __name__ == "__main__":
     train_files = []
     val_files = []
     for val, seq in zip(vals, seqs):
+        print(seq)
         video_path = os.path.join(dataset_path, seq, "img1")
         filenames = os.listdir(video_path)
+        # print(filenames)
         frame_ids = [int(filename.removesuffix(".jpg")) for filename in filenames]
         train = set(frame_ids) - set(val)
         train = list(train)
@@ -49,8 +63,8 @@ if __name__ == "__main__":
     train_annotaions = split_by_name(anns, train_files)
     val_annotaions = split_by_name(anns, val_files)
 
-    json.dump(train_annotaions, open(train_path, "w"))
-    json.dump(val_annotaions, open(val_path, "w"))
+    json.dump(train_annotaions, open(train_path, "w"), indent=4)
+    json.dump(val_annotaions, open(val_path, "w"), indent=4)
         
 
 

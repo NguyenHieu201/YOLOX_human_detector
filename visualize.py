@@ -60,6 +60,7 @@ def draw_seq(in_path="datasets/mlti_cam/many_people_cut1m/ch03/train/cam/img1", 
     outdir = f"./output/det"
     if not os.path.exists(outdir):
         os.makedirs(outdir)
+    
     for i in tqdm(range(1, 1801)):
         filename = os.path.join(in_path, f"{i:06d}.jpg")
         img = cv2.imread(filename)
@@ -75,7 +76,8 @@ def draw_seq(in_path="datasets/mlti_cam/many_people_cut1m/ch03/train/cam/img1", 
 
 
 # image_id = 1800
-draw_seq(pred="./output/detection/ch03_nms70_conf0/yolox_2023_10_26_79.json")
+draw_seq(in_path="./datasets/supermarket_dataset/train/", 
+         pred="./output/detection/ch03_nms70_conf0/yolox_2023_10_26_79.json")
 # draw("./output/detection/ch03_nms85_conf1/bytetrack_l_mot17.json", image_id)
 # for image_id in range(10, 1810, 10):
     # draw("./output/detection/ch03_nms85_conf1/bytetrack_l_mot17.json", image_id)

@@ -124,7 +124,7 @@ class Trainer:
 
     def before_train(self):
         logger.info("args: {}".format(self.args))
-        logger.info("exp value:\n{}".format(self.exp))
+        # logger.info("exp value:\n{}".format(self.exp))
 
         # model related init
         torch.cuda.set_device(self.local_rank)
@@ -206,7 +206,7 @@ class Trainer:
         if self.use_model_ema:
             self.ema_model.update_attr(self.model)
 
-        if (self.epoch + 1) % 5 == 0:
+        if (self.epoch + 1) % self.exp.save_interval == 0:
             print(f"Save model at epoch {self.epoch + 1}")
             self.save_ckpt(ckpt_name=f"epoch_{self.epoch + 1}")
 
