@@ -315,6 +315,7 @@ class Trainer:
 
         #self.best_ap = max(self.best_ap, ap50_95)
         self.save_ckpt("last_epoch", ap50 > self.best_ap)
+        self.save_ckpt(f"{self.epoch}", False)
         self.best_ap = max(self.best_ap, ap50)
 
     def evaluate(self):

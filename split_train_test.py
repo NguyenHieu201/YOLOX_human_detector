@@ -1,10 +1,11 @@
 import os
 import json
+import random
 
-annotation_path = "./datasets/supermarket_hd/annotations/data.json"
-dataset_path = "./datasets/supermarket_hd/train/"
-train_path = "./datasets/supermarket_hd/annotations/train.json"
-val_path = "./datasets/supermarket_hd/annotations/val.json"
+annotation_path = "/home/hieu/hieunm/ByteTrack/datasets/supermarket_train_20240220/annotations/data.json"
+dataset_path = "/home/hieu/hieunm/ByteTrack/datasets/supermarket_train_20240220/train"
+train_path = "/home/hieu/hieunm/ByteTrack/datasets/supermarket_train_20240220/annotations/train.json"
+val_path = "/home/hieu/hieunm/ByteTrack/datasets/supermarket_train_20240220/annotations/val.json"
 train_ratio = 0.8
 # seqs = ["201_20231129_184822", "202_20231129_184822", "203_20231129_184822", "204_20231129_184822",
 #         "201_20231204_120908", "202_20231204_120908", "203_20231204_120908", "204_20231204_120908",
@@ -19,12 +20,15 @@ train_ratio = 0.8
 #         list(range(0, 60)) + list(range(1450, 1510)), list(range(13, 73)) + list(range(1310, 1370))]
 
 
-seqs = ["205_20231208_2045_1920",
-        "205_20231220_185141",
-        "206_20231220_185141"]
-vals = [list(range(14, 54)),
-        list(range(0, 60)) + list(range(1450, 1510)),
-        list(range(13, 73)) + list(range(1310, 1370))]
+# seqs = ["205_20231208_2045_1920",
+#         "205_20231220_185141",
+#         "206_20231220_185141"]
+# vals = [list(range(14, 54)),
+#         list(range(0, 60)) + list(range(1450, 1510)),
+#         list(range(13, 73)) + list(range(1310, 1370))]
+
+seqs = os.listdir(dataset_path)
+vals = [list(range(1220, 1240))] * len(seqs)
 
 def split_by_name(annotations, filenames):
     datas = {"images": [], "annotations": [], "videos": [], "categories": []}
@@ -52,8 +56,13 @@ if __name__ == "__main__":
         filenames = os.listdir(video_path)
         # print(filenames)
         frame_ids = [int(filename.removesuffix(".jpg")) for filename in filenames]
-        train = set(frame_ids) - set(val)
-        train = list(train)
+        
+        # train = set(frame_ids) - set(val)
+        # train = list(train)
+        
+        num_val = int((1 - train_ratio) * len(frame_ids))
+        val = random.choices(frame_ids, k=num_val)
+        train = list(set(frame_ids) - set(val))
 
         for idx in train:
             train_files.append(os.path.join(seq, "img1", f"{idx:06d}.jpg"))

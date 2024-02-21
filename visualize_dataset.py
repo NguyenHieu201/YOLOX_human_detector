@@ -31,7 +31,7 @@ def visuzlize_dataset(in_path, annotations, out_path):
         cv2.imwrite(os.path.join(out_path, f"{image_id}.jpg"), img)
 
 if __name__ == "__main__":
-    visuzlize_dataset(in_path="./datasets/supermarket_dataset/train",
-                      annotations="./datasets/supermarket_dataset/annotations/data.json",
+    visuzlize_dataset(in_path="/home/hieu/hieunm/ByteTrack/datasets/supermarket_train_20240220/train",
+                      annotations="/home/hieu/hieunm/ByteTrack/datasets/supermarket_train_20240220/annotations/train.json",
                       out_path="./visualize_dataset")
 
