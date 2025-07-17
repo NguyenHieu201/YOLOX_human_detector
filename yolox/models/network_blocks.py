@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # Copyright (c) 2014-2021 Megvii Inc. All rights reserved.
+import os
 
 import torch
 import torch.nn as nn
@@ -14,11 +15,20 @@ class SiLU(nn.Module):
         return x * torch.sigmoid(x)
 
 
+class ReLU(nn.Module):
+    @staticmethod
+    def forward(x):
+        return torch.nn.functional.relu(x)
+
+
 def get_activation(name="silu", inplace=True):
     if name == "silu":
-        module = nn.SiLU(inplace=inplace)
+        # module = nn.SiLU(inplace=inplace)
+        # module = nn.ReLU(inplace=True)
+        module = nn.LeakyReLU(0.1, inplace=inplace)
     elif name == "relu":
-        module = nn.ReLU(inplace=inplace)
+        module = nn.LeakyReLU(0.1, inplace=inplace)
+        # module = nn.ReLU(inplace=inplace)
     elif name == "lrelu":
         module = nn.LeakyReLU(0.1, inplace=inplace)
     else:
@@ -128,12 +138,20 @@ class SPPBottleneck(nn.Module):
         super().__init__()
         hidden_channels = in_channels // 2
         self.conv1 = BaseConv(in_channels, hidden_channels, 1, stride=1, act=activation)
-        self.m = nn.ModuleList(
-            [
-                nn.MaxPool2d(kernel_size=ks, stride=1, padding=ks // 2)
-                for ks in kernel_sizes
-            ]
-        )
+        if os.getenv("RKNN_model_hack", "0") in ["1"]:
+            self.m = nn.ModuleList(
+                [
+                    nn.Sequential(*[nn.MaxPool2d(3, 1, 1) for i in range(ks // 2)])
+                    for ks in kernel_sizes
+                ]
+            )
+        else:
+            self.m = nn.ModuleList(
+                [
+                    nn.MaxPool2d(kernel_size=ks, stride=1, padding=ks // 2)
+                    for ks in kernel_sizes
+                ]
+            )
         conv2_channels = hidden_channels * (len(kernel_sizes) + 1)
         self.conv2 = BaseConv(conv2_channels, out_channels, 1, stride=1, act=activation)
 
@@ -208,3 +226,46 @@ class Focus(nn.Module):
             dim=1,
         )
         return self.conv(x)
+
+
+class Focus_slice(nn.Module):
+    def __init__(self):
+        super(Focus_slice, self).__init__()
+
+    def forward(self, x):
+        patch_top_left = x[..., ::2, ::2]
+        patch_top_right = x[..., ::2, 1::2]
+        patch_bot_left = x[..., 1::2, ::2]
+        patch_bot_right = x[..., 1::2, 1::2]
+        x = torch.cat(
+            (
+                patch_top_left,
+                patch_bot_left,
+                patch_top_right,
+                patch_bot_right,
+            ),
+            dim=1,
+        )
+        return x
+
+
+class Focus_conv(nn.Module):
+    def __init__(self):
+        super(Focus_conv, self).__init__()
+        with torch.no_grad():
+            self.convsp = nn.Conv2d(3, 12, (2, 2), groups=1, bias=False, stride=(2, 2))
+            self.convsp.weight.data = torch.zeros(self.convsp.weight.shape).float()
+            for i in range(4):
+                for j in range(3):
+                    ch = i * 3 + j
+                    if ch >= 0 and ch < 3:
+                        self.convsp.weight[ch : ch + 1, j : j + 1, 0, 0] = 1
+                    elif ch >= 3 and ch < 6:
+                        self.convsp.weight[ch : ch + 1, j : j + 1, 1, 0] = 1
+                    elif ch >= 6 and ch < 9:
+                        self.convsp.weight[ch : ch + 1, j : j + 1, 0, 1] = 1
+                    elif ch >= 9 and ch < 12:
+                        self.convsp.weight[ch : ch + 1, j : j + 1, 1, 1] = 1
+
+    def forward(self, x):
+        return self.convsp(x)

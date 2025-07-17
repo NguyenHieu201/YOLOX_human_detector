@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 # Copyright (c) 2014-2021 Megvii Inc. All rights reserved.
 
+import os
 from loguru import logger
 
 import torch
@@ -206,6 +207,9 @@ class YOLOXHead(nn.Module):
             )
         else:
             self.hw = [x.shape[-2:] for x in outputs]
+            
+            if os.getenv('RKNN_model_hack', '0') in ['1']:
+                return outputs
             # [batch, n_anchors_all, 85]
             outputs = torch.cat(
                 [x.flatten(start_dim=2) for x in outputs], dim=2

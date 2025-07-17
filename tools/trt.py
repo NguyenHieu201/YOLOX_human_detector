@@ -54,9 +54,10 @@ def main():
     model_trt = torch2trt(
         model,
         [x],
-        fp16_mode=True,
+        # fp32_mode=True,
+        int8_mode=True,
         log_level=trt.Logger.INFO,
-        max_workspace_size=(1 << 32),
+        max_workspace_size=(1 << 16),
     )
     torch.save(model_trt.state_dict(), os.path.join(file_name, "model_trt.pth"))
     logger.info("Converted TensorRT model done.")
