@@ -23,14 +23,15 @@ class ReLU(nn.Module):
 
 def get_activation(name="silu", inplace=True):
     if name == "silu":
-        # module = nn.SiLU(inplace=inplace)
-        # module = nn.ReLU(inplace=True)
-        module = nn.LeakyReLU(0.1, inplace=inplace)
+        module = nn.SiLU(inplace=inplace)
+        # module = nn.Mish(inplace=inplace)
     elif name == "relu":
         module = nn.LeakyReLU(0.1, inplace=inplace)
         # module = nn.ReLU(inplace=inplace)
     elif name == "lrelu":
         module = nn.LeakyReLU(0.1, inplace=inplace)
+    elif name == "elu":
+        module = nn.ELU(inplace=inplace)
     else:
         raise AttributeError("Unsupported act type: {}".format(name))
     return module
