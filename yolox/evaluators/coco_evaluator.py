@@ -128,7 +128,7 @@ class COCOEvaluator:
             data_list.extend(self.convert_to_coco_format(outputs, info_imgs, ids))
             # json.dump(data_list, open("./temp/output.json", "w"))
             # json.dump(data_list, open("epoch_30/output.json", "w"))
-            json.dump(data_list, open(self.save_path, "w"))
+            # json.dump(data_list, open(self.save_path, "w"))
 
         statistics = torch.cuda.FloatTensor([inference_time, nms_time, n_samples])
         if distributed:

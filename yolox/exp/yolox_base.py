@@ -247,3 +247,6 @@ class Exp(BaseExp):
 
     def eval(self, model, evaluator, is_distributed, half=False):
         return evaluator.evaluate(model, is_distributed, half)
+
+    def set_save_path(self, file_path):
+        self.save_path = file_path
